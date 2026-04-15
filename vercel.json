@@ -1,0 +1,10 @@
+{
+  "buildCommand": "tsc",
+  "outputDirectory": "public",
+  "framework": null,
+  "functions": {
+    "api/*.ts": {
+      "runtime": "nodejs18.x"
+    }
+  }
+}

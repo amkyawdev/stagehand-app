@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🤖 Stagehand AI Browser</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      color: #fff;
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: #8b8b9e;
+      font-size: 1.1rem;
+    }
+
+    .card {
+      background: #1e1e2e;
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      color: #a0a0b0;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    select, input, textarea {
+      width: 100%;
+      padding: 12px 16px;
+      background: #2a2a3e;
+      border: 1px solid #3a3a4e;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+
+    select:focus, input:focus, textarea:focus {
+      outline: none;
+      border-color: #6366f1;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+    }
+
+    button:disabled {
+      background: #4a4a5e;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .result {
+      background: #0f0f1a;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+      display: none;
+    }
+
+    .result.show {
+      display: block;
+    }
+
+    .result-header {
+      color: #6366f1;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .result-content {
+      color: #e0e0e0;
+      white-space: pre-wrap;
+      font-family: monospace;
+      font-size: 0.9rem;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .error {
+      color: #ef4444;
+    }
+
+    .success {
+      color: #10b981;
+    }
+
+    .history {
+      margin-top: 2rem;
+    }
+
+    .history-title {
+      color: #a0a0b0;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .history-item {
+      background: #1e1e2e;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      border-left: 3px solid #6366f1;
+    }
+
+    .history-action {
+      color: #6366f1;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .history-instruction {
+      color: #e0e0e0;
+      margin: 0.5rem 0;
+    }
+
+    .history-result {
+      color: #8b8b9e;
+      font-size: 0.85rem;
+    }
+
+    .loader {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #fff;
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .nav-actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .nav-btn {
+      padding: 10px;
+      background: #2a2a3e;
+      border: 1px solid #3a3a4e;
+      border-radius: 8px;
+      color: #a0a0b0;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover {
+      background: #3a3a4e;
+      color: #fff;
+    }
+
+    .quick-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .quick-btn {
+      padding: 6px 12px;
+      background: #2a2a3e;
+      border: 1px solid #3a3a4e;
+      border-radius: 20px;
+      color: #a0a0b0;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .quick-btn:hover {
+      background: #6366f1;
+      color: #fff;
+      border-color: #6366f1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🤖 Stagehand AI Browser</h1>
+      <p class="subtitle">AI-powered web automation လမ်းညွှန်</p>
+    </header>
+
+    <div class="card">
+      <div class="form-group">
+        <label>🌐 URL ထည့်ပါး</label>
+        <input type="text" id="url" placeholder="https://example.com">
+      </div>
+
+      <div class="form-group">
+        <label>📋 အရေးအသား</label>
+        <textarea id="instruction" placeholder="ဥပမာ။ ။ ဤစာမျက်နှာမှာ ဘာတွေ လုပ်လို့ရပပလဲ?"></textarea>
+      </div>
+
+      <div class="quick-actions">
+        <button class="quick-btn" onclick="setInstruction('ဤစာမျက်နှာရဲ့ အဓိက အကြောင်းအရာကို ထုတ်ယူပါး')">📝 ထုတ်ယူ</button>
+        <button class="quick-btn" onclick="setInstruction('Login လုပ်ပါး')">🔐 Login</button>
+        <button class="quick-btn" onclick="setInstruction('Scroll လုပ်ပါး')">⬇️ Scroll</button>
+        <button class="quick-btn" onclick="setInstruction('Screenshot ယူပါး')">📸 Screenshot</button>
+        <button class="quick-btn" onclick="setInstruction('ဤစာမျက်နှာမှာ ရှိတဲ့ လင့်ခ်များကို စာရင်းလုပ်ပါး')">🔗 လင့်ခ်များ</button>
+      </div>
+
+      <button id="submitBtn" onclick="executeAction()">
+        ▶️ လုပ်ဆောင်ပါး
+      </button>
+
+      <div class="result" id="result">
+        <div class="result-header">📋 ရလဒ်:</div>
+        <div class="result-content" id="resultContent"></div>
+      </div>
+    </div>
+
+    <div class="history">
+      <div class="history-title">📜 လုပ်ဆောင်မှု မှတ်တမ်း</div>
+      <div id="historyList"></div>
+    </div>
+  </div>
+
+  <script>
+    let actionHistory = [];
+
+    function setInstruction(text) {
+      document.getElementById('instruction').value = text;
+    }
+
+    async function executeAction() {
+      const url = document.getElementById('url').value;
+      const instruction = document.getElementById('instruction').value;
+      const submitBtn = document.getElementById('submitBtn');
+      const resultDiv = document.getElementById('result');
+      const resultContent = document.getElementById('resultContent');
+
+      if (!url && actionHistory.length === 0) {
+        alert("URL ထည့်ပါး။");
+        return;
+      }
+
+      if (!instruction) {
+        alert("အရေးအသား ထည့်ပါး။");
+        return;
+      }
+
+      // Determine action type
+      let action = 'act';
+      const lowerInstruction = instruction.toLowerCase();
+      
+      if (lowerInstruction.includes('ထုတ်ယူ') || lowerInstruction.includes('extract')) {
+        action = 'extract';
+      } else if (lowerInstruction.includes('observe') || lowerInstruction.includes('ဘာတွေ') || lowerInstruction.includes('ရှိတဲ့')) {
+        action = 'observe';
+      } else if (lowerInstruction.includes('agent') || lowerInstruction.includes('အေးဂျင့်')) {
+        action = 'agent';
+      }
+
+      // Show loading
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="loader"></span> စောင့်ပါး...';
+      resultDiv.classList.remove('show');
+
+      try {
+        const response = await fetch('/api', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: action,
+            instruction: instruction,
+            url: url
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+          resultContent.innerHTML = `<span class="error">❌ အမှား: ${data.error}</span>`;
+        } else {
+          resultContent.innerHTML = `<span class="success">✅ အောင်မြင်ပါး!</span><br><br>${JSON.stringify(data.result, null, 2)}`;
+          
+          // Add to history
+          addToHistory(action, instruction, data.result);
+        }
+      } catch (error) {
+        resultContent.innerHTML = `<span class="error">❌ အမှား: ${error.message}</span>`;
+      }
+
+      resultDiv.classList.add('show');
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '▶️ လုပ်ဆောင်ပါး';
+    }
+
+    function addToHistory(action, instruction, result) {
+      actionHistory.unshift({
+        action: action,
+        instruction: instruction,
+        result: result,
+        timestamp: new Date().toLocaleString()
+      });
+
+      if (actionHistory.length > 10) {
+        actionHistory.pop();
+      }
+
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const historyList = document.getElementById('historyList');
+      historyList.innerHTML = actionHistory.map(item => `
+        <div class="history-item">
+          <div class="history-action">${getActionIcon(item.action)} ${item.action.toUpperCase()}</div>
+          <div class="history-instruction">${item.instruction}</div>
+          <div class="history-result">${new Date(item.timestamp).toLocaleTimeString()}</div>
+        </div>
+      `).join('');
+    }
+
+    function getActionIcon(action) {
+      const icons = {
+        'act': '👆',
+        'extract': '📝',
+        'observe': '👁️',
+        'agent': '🤖',
+        'navigate': '🌐'
+      };
+      return icons[action] || '📋';
+    }
+  </script>
+</body>
+</html>
