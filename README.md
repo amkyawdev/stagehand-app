@@ -10,7 +10,7 @@
 
 Welcome to **Stagehand** - a powerful AI-powered browser automation framework built on top of [Playwright](https://playwright.dev/). This project enables you to build intelligent web agents that can navigate, extract, and interact with websites autonomously.
 
-![Stagehand Banner](https://stagehand.dev/banner.png)
+![Stagehand Banner](https://github.com/amkyawdev/banner.png)
 
 ## ✨ Features
 
